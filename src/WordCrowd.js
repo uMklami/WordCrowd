@@ -118,31 +118,31 @@ var WordCrowd = function (options){
 	self = this;
 	
 	var settings = {
-		container:"body",
-		data : text,
+		container:'body',
+		data : 'Computer science is the scientific and practical approach to computation and its applications. It is the systematic study of the feasibility,structure, expression, and mechanization of the methodical procedures or algorithms that underlie the acquisition, representation,processing storage, communication of, and access to information, whether such information is encoded as bits.',
 		width:800,
 		fontsize_range : {
 			min : 20,
 			max : 40
 		},
-		hover_color :"grey",
+		hover_color :'grey',
 		height:600,
 		max_tries:700,
 		max_rotate_size:30,
 		angles : [0,90], // angles should be between 0 and 360
-		colors:"random",
-		background :"white",
-		font_families:[ "Arial Bold Italic", "Verdana", "Helvetica" ,"Monaco", "monospace" , "Bold Italic" , "Lao UI Bold" , "Bodoni MT Black Italic"],
+		colors:'random',
+		background :'white',
+		font_families:[ 'Arial Bold Italic', 'Verdana', 'Helvetica', 'Monaco', 'monospace' , 'Bold Italic', 'Lao UI Bold' , 'Bodoni MT Black Italic'],
 			
 	};
 	
 	//. override default settings...
 	if (typeof options != 'undefined') {
-      for (var prop in options) {
-        if (prop in settings) {
-          settings[prop] = options[prop];
-        }
-      }
+		for (var prop in options) {
+			if (prop in settings) {
+				settings[prop] = options[prop];
+			}
+		}
     }
 	
 	settings.data = wordFrequency(settings.data);
@@ -157,7 +157,7 @@ var WordCrowd = function (options){
 				.on("dblclick", function(){ self.redraw();
 			});
 			
-		var label = svg.selectAll(".place-label")
+	var label = svg.selectAll(".place-label")
 				.data(settings.data)
 				.enter().append("text");
 		
