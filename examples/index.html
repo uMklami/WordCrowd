@@ -1,22 +1,28 @@
+<!DOCTYPE html>
 <html>
 <head>
 	<title>WordCrowd</title>
-
+	
+	<style>
+		.place-label:hover{
+			cursor:pointer;
+		}
+	</style>
 	<script src="../src/lib/d3.v3.min.js"></script>
 	<script src="../src/WordCrowd.js"></script>
 </head>
 <body>
-	<div id="wordcramContainer"></div>
+	<div id="wordCrowdContainer"></div>
 	<script>
-	var text = "Computer science is the scientific and practical approach to computation and its applications. It is the systematic study of the feasibility,structure, expression, and mechanization of the methodical procedures or algorithms that underlie the acquisition, representation,processing storage, communication of, and access to information, whether such information is encoded as bits.";
+	var text = "Computer science is the scientific scientific scientific and practical approach to computation computation computation and its applications. It is the systematic study of the feasibility,structure, expression, and mechanization of the methodical procedures procedures procedures or algorithms that underlie the acquisition, representation,processing storage, communication communication of, and access to information, whether such information information information is encoded as bits.";
 
 	var options = {
-		container:"#wordcramContainer",
+		container:"#wordCrowdContainer",
 		data : text,
 		width:1300,
 		fontsize_range : {
 			min : 20,
-			max : 40
+			max : 80
 		},
 		hover_color :"grey",
 		height:700,

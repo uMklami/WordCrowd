@@ -112,9 +112,9 @@ function wordFrequency (stringLine) {
 }
 
 var WordCrowd = function (options){
-	
 	var svg,
 	defaultcolor,
+	linearFontScale,
 	self = this;
 	
 	var settings = {
@@ -123,7 +123,7 @@ var WordCrowd = function (options){
 		width:800,
 		fontsize_range : {
 			min : 20,
-			max : 40
+			max : 80
 		},
 		hover_color :'grey',
 		height:600,
@@ -149,6 +149,10 @@ var WordCrowd = function (options){
 	
 	self.init = function(options){
 		
+		linearFontScale = d3.scale.linear()
+					  .domain([1, 10])
+					  .range([settings.fontsize_range.min, settings.fontsize_range.max]);
+					  
 		svg = d3.select(settings.container)
 				.append("svg")
 				.attr("width", settings.width)
@@ -175,12 +179,8 @@ var WordCrowd = function (options){
 			});
 
 		label.style("font-size", function(d){
-			var font_size = d.size;
-			if(font_size < settings.fontsize_range.min){
-				font_size = settings.fontsize_range.min;
-			}else if(font_size > settings.fontsize_range.max){
-				font_size = settings.fontsize_range.max;
-			}
+			var font_size = linearFontScale(d.size);
+			console.log(font_size);
 			return font_size;
 		})
 		.style("fill", function(d){
@@ -285,7 +285,14 @@ var WordCrowd = function (options){
 			(a.left > (b.left + b.width))
 			);  
 	};
-			
+	
+	self.normalizeFontSize = function(font_size){
+		if(font_size < settings.fontsize_range.min){
+			font_size = settings.fontsize_range.min;
+		}else if(font_size > settings.fontsize_range.max){
+			font_size = settings.fontsize_range.max;
+		}
+	}
 	//. initialize WordCrowd
 	self.init();
 
