@@ -34,84 +34,56 @@ var WordCrowd = function (options){
 	
 	
 	self.init = function(options){
-		self.setOptions(options);
-		self.setSvg();
+		/*self.setSvg();
 		self.addLabels();
 		self.addAttr();
 		self.setStyle();
-		self.setText();
-	};
-
-	self.setSvg = function(){
+		self.setText();*/
+		
 		svg = d3.select(settings.container)
-		.append("svg")
-		.attr("width", settings.width)
-		.attr("height", settings.height)
-		.style("background",settings.background)
-		.on("dblclick", function(){ self.redraw();
+				.append("svg")
+				.attr("width", settings.width)
+				.attr("height", settings.height)
+				.style("background",settings.background)
+				.on("dblclick", function(){ self.redraw();
+			});
+			
+		var label = svg.selectAll(".place-label")
+				.data(settings.data)
+				.enter().append("text");
+		
+		label.attr("class", "place-label")
+			.attr("font-family", function(d){ return (settings.font_families.length > 1) ? self.getRandom(settings.font_families): settings.font_families;})
+			.on("click", function(d){
+				console.log(d.word);
+			})
+			.on("mouseover", function(d){
+				defaultcolor = d.color;
+				d3.select(this).style("fill" , settings.hover_color);
+			})
+			.on("mouseout", function(d){
+					d3.select(this).style("fill" , defaultcolor);
+			});
 
-		});
-
-	};
-
-	self.addLabels = function(){
-
-		text = svg.selectAll(".place-label")
-		.data(settings.data)
-		.enter().append("text");
-
-
-	};	
-
-	self.addAttr = function(){
-		text.attr("class", "place-label")
-		.attr("font-family", function(d){ return (settings.font_families.length >1)? self.getRandom(font_families): font_families;})
-		.on("click", function(d){
-			alert(d.word);
-		})
-		.on("mouseover", function(d){
-    		defaultcolor = d.color;
-    		d3.select(this).style("fill" , settings.hover_color);
-    		
-		})
-		.on("mouseout", function(d){
-				d3.select(this).style("fill" , defaultcolor);
-		})
-		;
-
-
-	};
-
-	self.setStyle = function(){
-
-		text.style("font-size", function(d){
-
-			if(d.size < settings.fontsize_range.min){
-				return settings.fontsize_range.min;
-			}else if(d.size>settings.fontsize_range.max){
-				return settings.fontsize_range.max;
+		label.style("font-size", function(d){
+			var font_size = d.size;
+			if(font_size < settings.fontsize_range.min){
+				font_size = settings.fontsize_range.min;
+			}else if(font_size > settings.fontsize_range.max){
+				font_size = settings.fontsize_range.max;
 			}
-			else{
-				return d.size;
-			}
+			return font_size;
 		})
-
 		.style("fill", function(d){
-			var textColor;
-            if(settings.colors = "random"){
-                 textColor = self.getRandomColor();
-            }else{
-            	textColor = settings.colors;
+			var d.color = settings.colors;
+            if(settings.colors == "random"){
+                 d.color = self.getRandomColor();
             }
-            d.color = textColor;
-            return textColor;
+            return d.color;
 			// return (settings.colors == "random")? self.getRandomColor() : settings.colors;});
-             });
-	};
-
-	self.setText = function(){
-
-		text.text(function(d) { return d.word; })
+         });
+		
+		label.text(function(d) { return d.word; })
 
 		.each(function(d, i){
 
@@ -139,12 +111,11 @@ var WordCrowd = function (options){
 				tried++;
 			}
 		});
-
 	};
 
 	self.redraw = function(){
 		svg.remove();
-		self.setOptions(options);
+		self.init();
 	};
 
 
@@ -220,6 +191,6 @@ var WordCrowd = function (options){
 			
 			
 			//. initialize WordCrowd
-			self.init(options);
+			self.init();
 
 		}
