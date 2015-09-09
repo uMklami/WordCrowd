@@ -1,6 +1,27 @@
+function wordFrequency (stringLine) {
+	
+   stringLine = stringLine.replace(/[.,-\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+   
+   stringLine = stringLine.removeStopWords();
+   words = stringLine.split(/\s/);
+   freqMap = {};
+   data = [];
+   words.forEach(function(w) {
+		if (!freqMap[w]) {
+			freqMap[w] = 0;
+		}
+		freqMap[w] += 1;
+	});
+	 for (var key in freqMap) {
+		//console.log("key : "+ key + ", value :" + freqMap[key]);
+		data.push({"word":key , "size":freqMap[key]});
+	 }
+	return data;
+}
+
 var WordCrowd = function (options){
+	
 	var svg,
-	text,
 	defaultcolor,
 	self = this;
 	
@@ -32,13 +53,9 @@ var WordCrowd = function (options){
       }
     }
 	
+	settings.data = wordFrequency(settings.data);
 	
 	self.init = function(options){
-		/*self.setSvg();
-		self.addLabels();
-		self.addAttr();
-		self.setStyle();
-		self.setText();*/
 		
 		svg = d3.select(settings.container)
 				.append("svg")
@@ -75,16 +92,14 @@ var WordCrowd = function (options){
 			return font_size;
 		})
 		.style("fill", function(d){
-			var d.color = settings.colors;
+			d.color = settings.colors;
             if(settings.colors == "random"){
                  d.color = self.getRandomColor();
             }
             return d.color;
-			// return (settings.colors == "random")? self.getRandomColor() : settings.colors;});
          });
 		
 		label.text(function(d) { return d.word; })
-
 		.each(function(d, i){
 
 			self.move(this);
@@ -95,18 +110,8 @@ var WordCrowd = function (options){
 					break;
 				}
 				d3.select(this).attr("transform", function(d , i){
-					getword = d.word;
-					wordLength =  getword.length;
-					console.log("word : "+ getword + " , length : "+wordLength);
-					if(wordLength > 10){
-						angle = "rotate(0)";
-					}else{
-						angle = "rotate("+self.getRandom(settings.angles)+")";
-					}
-						// return (d.size < max_rotate_size) && (tried%4 == 0) ? "rotate(270)" : "rotate(0)";
-						return angle;
-						
-					});
+						return d.word.length  > 10 ? "rotate(0)" : "rotate("+self.getRandom(settings.angles)+")";
+				});
 				self.move(this);
 				tried++;
 			}
@@ -138,59 +143,58 @@ var WordCrowd = function (options){
 
 		var a = word.getBoundingClientRect();
 
-				var fieldWidth = settings.width;//canvas.width;
-				var fieldHeight = settings.height;//canvas.height;
-				var centerHorizLine =  ((fieldHeight - a.height) * 0.5);//450*.5
-				var  centerVertLine =  ((fieldWidth - a.width) * 0.5);
+		var fieldWidth = settings.width;//canvas.width;
+		var fieldHeight = settings.height;//canvas.height;
+		var centerHorizLine =  ((fieldHeight - a.height) * 0.5);//450*.5
+		var  centerVertLine =  ((fieldWidth - a.width) * 0.5);
 
-				var  xOff =  z.nextGaussian() * ((fieldWidth - a.width) *0.2);
-				var  yOff =  z.nextGaussian() * 50;
-				return [centerVertLine + xOff, centerHorizLine + yOff];
-			};
+		var  xOff =  z.nextGaussian() * ((fieldWidth - a.width) *0.2);
+		var  yOff =  z.nextGaussian() * 50;
+		return [centerVertLine + xOff, centerHorizLine + yOff];
+	};
 			
-			self.is_collide = function(that){
+	self.is_collide = function(that){
 
-				var DO_NOTHING = false;
-				var COLLIDED = false;
-				var a = that.getBoundingClientRect();
-				svg.selectAll(".place-label")
-				.each(function(d, i) {
-					if(DO_NOTHING || COLLIDED || this == that) {
-						DO_NOTHING = true;
-					}else{
-						var b = this.getBoundingClientRect();
-						if(self.collide(a, b)){
-							COLLIDED =  true;
-						}
-					}
-				});
-				
-				return COLLIDED;
-			};
-			self.move = function(word){
-				var gaussians = self.getNextCoordinates(word);
-				//. check if the word is drawn out of the container
-				var right_pos = settings.width - (word.getBoundingClientRect().width + 12);
-				while(gaussians[0] < 12 || gaussians[0] > right_pos){
-					gaussians = self.getNextCoordinates(word);
+		var DO_NOTHING = false;
+		var COLLIDED = false;
+		var a = that.getBoundingClientRect();
+		svg.selectAll(".place-label")
+		.each(function(d, i) {
+			if(DO_NOTHING || COLLIDED || this == that) {
+				DO_NOTHING = true;
+			}else{
+				var b = this.getBoundingClientRect();
+				if(self.collide(a, b)){
+					COLLIDED =  true;
 				}
-				
-				var to = d3.transform(d3.select(word).attr("transform"));
-				to.translate = [ gaussians[0], gaussians[1] ];
-				d3.select(word).attr("transform", "translate(" + to.translate + ")rotate("+to.rotate+")");
-			};
-
-			self.collide = function(a, b){
-				return !(
-					((a.top + a.height) < (b.top)) ||
-					(a.top > (b.top + b.height)) ||
-					((a.left + a.width) < b.left) ||
-					(a.left > (b.left + b.width))
-					);  
-			};
-			
-			
-			//. initialize WordCrowd
-			self.init();
-
+			}
+		});
+		
+		return COLLIDED;
+	};
+	self.move = function(word){
+		var gaussians = self.getNextCoordinates(word);
+		//. check if the word is drawn out of the container
+		var right_pos = settings.width - (word.getBoundingClientRect().width + 12);
+		while(gaussians[0] < 12 || gaussians[0] > right_pos){
+			gaussians = self.getNextCoordinates(word);
 		}
+		
+		var to = d3.transform(d3.select(word).attr("transform"));
+		to.translate = [ gaussians[0], gaussians[1] ];
+		d3.select(word).attr("transform", "translate(" + to.translate + ")rotate("+to.rotate+")");
+	};
+
+	self.collide = function(a, b){
+		return !(
+			((a.top + a.height) < (b.top)) ||
+			(a.top > (b.top + b.height)) ||
+			((a.left + a.width) < b.left) ||
+			(a.left > (b.left + b.width))
+			);  
+	};
+			
+	//. initialize WordCrowd
+	self.init();
+
+}
