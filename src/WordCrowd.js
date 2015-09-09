@@ -94,7 +94,7 @@ function wordFrequency (stringLine) {
 	
    stringLine = stringLine.replace(/[.,-\/#!$%\^&\*;:{}=\-_`~()]/g,"");
    
-   stringLine = stringLine.removeStopWords();
+   //. stringLine = stringLine.removeStopWords();
    words = stringLine.split(/\s/);
    freqMap = {};
    data = [];
