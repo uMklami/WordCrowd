@@ -1,38 +1,38 @@
-function WordCrowd(options){
+var WordCrowd = function (options){
 	var svg,
 	text,
-	fonts_option = {},
-	overcolor,
-	container,
 	defaultcolor,
-	width,
-	height,
-	data,
-	max_tries,
-	colors,
-	background,
-	font_families,
-	angles,
 	self = this;
-	self.setOptions = function(options){
-
-		container = options.container;
-		width     = options.width;
-		height    = options.height;
-		data      = options.data;
-		max_tries = options.max_tries;
-		background = options.background;
-		font_families = options.font_families;
-		colors    =options.colors;
-		max_rotate_size = options.max_rotate_size;
-		angles = options.angles;
-		fonts_option = options.fonts;
-		overcolor = options.over_color;
-		//.self.init(options);
-
-
+	
+	var settings = {
+		container:"body",
+		data : text,
+		width:800,
+		fontsize_range : {
+			min : 20,
+			max : 40
+		},
+		hover_color :"grey",
+		height:600,
+		max_tries:700,
+		max_rotate_size:30,
+		angles : [0,90], // angles should be between 0 and 360
+		colors:"random",
+		background :"white",
+		font_families:[ "Arial Bold Italic", "Verdana", "Helvetica" ,"Monaco", "monospace" , "Bold Italic" , "Lao UI Bold" , "Bodoni MT Black Italic"],
+			
 	};
-
+	
+	//. override default settings...
+	if (typeof options != 'undefined') {
+      for (var prop in options) {
+        if (prop in settings) {
+          settings[prop] = options[prop];
+        }
+      }
+    }
+	
+	
 	self.init = function(options){
 		self.setOptions(options);
 		self.setSvg();
@@ -43,11 +43,11 @@ function WordCrowd(options){
 	};
 
 	self.setSvg = function(){
-		svg = d3.select(container)
+		svg = d3.select(settings.container)
 		.append("svg")
-		.attr("width", width)
-		.attr("height", height)
-		.style("background",background)
+		.attr("width", settings.width)
+		.attr("height", settings.height)
+		.style("background",settings.background)
 		.on("dblclick", function(){ self.redraw();
 
 		});
@@ -57,7 +57,7 @@ function WordCrowd(options){
 	self.addLabels = function(){
 
 		text = svg.selectAll(".place-label")
-		.data(data)
+		.data(settings.data)
 		.enter().append("text");
 
 
@@ -65,13 +65,13 @@ function WordCrowd(options){
 
 	self.addAttr = function(){
 		text.attr("class", "place-label")
-		.attr("font-family", function(d){ return (font_families.length >1)? self.getRandom(font_families): font_families;})
+		.attr("font-family", function(d){ return (settings.font_families.length >1)? self.getRandom(font_families): font_families;})
 		.on("click", function(d){
 			alert(d.word);
 		})
 		.on("mouseover", function(d){
     		defaultcolor = d.color;
-    		d3.select(this).style("fill" , overcolor);
+    		d3.select(this).style("fill" , settings.hover_color);
     		
 		})
 		.on("mouseout", function(d){
@@ -86,10 +86,10 @@ function WordCrowd(options){
 
 		text.style("font-size", function(d){
 
-			if(d.size < fonts_option.min){
-				return fonts_option.min;
-			}else if(d.size>fonts_option.max){
-				return fonts_option.max;
+			if(d.size < settings.fontsize_range.min){
+				return settings.fontsize_range.min;
+			}else if(d.size>settings.fontsize_range.max){
+				return settings.fontsize_range.max;
 			}
 			else{
 				return d.size;
@@ -98,14 +98,14 @@ function WordCrowd(options){
 
 		.style("fill", function(d){
 			var textColor;
-            if(colors = "random"){
+            if(settings.colors = "random"){
                  textColor = self.getRandomColor();
             }else{
-            	textColor = colors;
+            	textColor = settings.colors;
             }
             d.color = textColor;
             return textColor;
-			// return (colors == "random")? self.getRandomColor() : colors;});
+			// return (settings.colors == "random")? self.getRandomColor() : settings.colors;});
              });
 	};
 
@@ -118,7 +118,7 @@ function WordCrowd(options){
 			self.move(this);
 			var tried = 0;
 			while(self.is_collide(this)){
-				if(tried > max_tries){
+				if(tried > settings.max_tries){
 					this.remove();
 					break;
 				}
@@ -129,7 +129,7 @@ function WordCrowd(options){
 					if(wordLength > 10){
 						angle = "rotate(0)";
 					}else{
-						angle = "rotate("+self.getRandom(angles)+")";
+						angle = "rotate("+self.getRandom(settings.angles)+")";
 					}
 						// return (d.size < max_rotate_size) && (tried%4 == 0) ? "rotate(270)" : "rotate(0)";
 						return angle;
@@ -167,8 +167,8 @@ function WordCrowd(options){
 
 		var a = word.getBoundingClientRect();
 
-				var fieldWidth = width;//canvas.width;
-				var fieldHeight = height;//canvas.height;
+				var fieldWidth = settings.width;//canvas.width;
+				var fieldHeight = settings.height;//canvas.height;
 				var centerHorizLine =  ((fieldHeight - a.height) * 0.5);//450*.5
 				var  centerVertLine =  ((fieldWidth - a.width) * 0.5);
 
@@ -199,7 +199,7 @@ function WordCrowd(options){
 			self.move = function(word){
 				var gaussians = self.getNextCoordinates(word);
 				//. check if the word is drawn out of the container
-				var right_pos = width - (word.getBoundingClientRect().width + 12);
+				var right_pos = settings.width - (word.getBoundingClientRect().width + 12);
 				while(gaussians[0] < 12 || gaussians[0] > right_pos){
 					gaussians = self.getNextCoordinates(word);
 				}
